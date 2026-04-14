@@ -2,559 +2,726 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>职业换脸图片生成器 - 自定义职业版</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>物联网浇花器 - 学生自评问卷</title>
+    <!-- Chart.js 轻量图表库 -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <!-- Font Awesome 6 (免费图标库，用于题目小图标) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: system-ui, 'Segoe UI', 'Poppins', 'Roboto', 'Noto Sans', sans-serif;
         }
-        
+
         body {
-            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
-            color: white;
+            background: linear-gradient(145deg, #eef7f0 0%, #d9e9e0 100%);
             min-height: 100vh;
-            padding: 20px;
+            padding: 1.5rem;
+            position: relative;
         }
-        
+
+        /* 物联网主题背景装饰 (低透明度图标) */
+        body::before {
+            content: "🌱💧📡💧🤖🌐💧🪴📶";
+            font-size: 180px;
+            position: fixed;
+            bottom: 20px;
+            right: 0;
+            opacity: 0.05;
+            pointer-events: none;
+            white-space: pre;
+            z-index: 0;
+            transform: rotate(-5deg);
+            letter-spacing: 20px;
+        }
+
         .container {
-            max-width: 1100px;
+            max-width: 1400px;
             margin: 0 auto;
-            padding: 20px;
+            position: relative;
+            z-index: 2;
         }
-        
-        header {
+
+        /* 主标题 */
+        .hero-title {
             text-align: center;
-            margin-bottom: 40px;
-            padding: 20px;
-            background: rgba(0, 0, 0, 0.3);
-            border-radius: 20px;
-            backdrop-filter: blur(10px);
+            background: rgba(255,255,240,0.85);
+            backdrop-filter: blur(2px);
+            padding: 1.2rem;
+            border-radius: 60px;
+            margin-bottom: 2rem;
+            box-shadow: 0 8px 20px rgba(0,32,0,0.08);
+            border: 1px solid #c0e0c8;
         }
-        
-        h1 {
-            font-size: 2.8rem;
-            margin-bottom: 15px;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        .hero-title h1 {
+            font-size: 1.9rem;
+            color: #1f5437;
+            letter-spacing: -0.3px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            flex-wrap: wrap;
         }
-        
-        .subtitle {
-            font-size: 1.3rem;
-            opacity: 0.9;
-            max-width: 700px;
-            margin: 0 auto;
-            line-height: 1.6;
+        .hero-title h1 i {
+            background: #ffb34720;
+            padding: 8px;
+            border-radius: 50%;
+            color: #f39c12;
         }
-        
-        .app-container {
+        .sub {
+            color: #2c6e49;
+            margin-top: 8px;
+            font-weight: 500;
+        }
+
+        /* 卡片样式 */
+        .card {
+            background: rgba(255, 255, 255, 0.94);
+            backdrop-filter: blur(2px);
+            border-radius: 2rem;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 12px 28px rgba(0, 32, 0, 0.12);
+            transition: all 0.2s;
+            border: 1px solid rgba(110, 170, 110, 0.3);
+        }
+
+        .card h2 {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 1.7rem;
+            color: #2a6b47;
+            border-left: 6px solid #ffb347;
+            padding-left: 18px;
+            margin-bottom: 1.2rem;
+        }
+
+        /* 问卷表单区 */
+        .form-row {
             display: flex;
             flex-wrap: wrap;
-            gap: 30px;
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(15px);
-            border-radius: 25px;
-            padding: 35px;
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
-            margin-bottom: 30px;
+            gap: 20px;
+            margin-bottom: 28px;
         }
-        
-        .upload-section {
+        .input-group {
             flex: 1;
-            min-width: 320px;
+            min-width: 180px;
         }
-        
-        .preview-section {
-            flex: 1;
-            min-width: 320px;
-        }
-        
-        .section-title {
-            font-size: 1.6rem;
-            margin-bottom: 25px;
-            border-bottom: 2px solid rgba(255, 255, 255, 0.4);
-            padding-bottom: 12px;
-            display: flex;
-            align-items: center;
-        }
-        
-        .section-title i {
-            margin-right: 10px;
-            font-size: 1.4rem;
-        }
-        
-        .upload-area {
-            border: 3px dashed rgba(255, 255, 255, 0.6);
-            border-radius: 20px;
-            padding: 50px 20px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            margin-bottom: 25px;
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .upload-area:hover {
-            background: rgba(255, 255, 255, 0.15);
-            border-color: rgba(255, 255, 255, 0.9);
-            transform: translateY(-5px);
-        }
-        
-        .upload-icon {
-            font-size: 70px;
-            margin-bottom: 20px;
-            color: rgba(255, 255, 255, 0.8);
-        }
-        
-        .upload-text {
-            font-size: 1.2rem;
-            margin-bottom: 15px;
-        }
-        
-        .upload-hint {
-            font-size: 0.9rem;
-            opacity: 0.7;
-        }
-        
-        #file-input {
-            display: none;
-        }
-        
-        .image-preview {
-            width: 100%;
-            height: 280px;
-            border-radius: 18px;
-            background: rgba(0, 0, 0, 0.25);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            overflow: hidden;
-            margin-bottom: 25px;
-            position: relative;
-            box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.2);
-        }
-        
-        .image-preview img {
-            max-width: 100%;
-            max-height: 100%;
-            object-fit: contain;
-            border-radius: 15px;
-        }
-        
-        .career-input-section {
-            margin-bottom: 25px;
-        }
-        
-        .career-label {
+        .input-group label {
+            font-weight: 600;
+            color: #1e4a2f;
             display: block;
-            margin-bottom: 15px;
-            font-size: 1.2rem;
-        }
-        
-        .career-input {
-            width: 100%;
-            padding: 15px 20px;
-            border-radius: 12px;
-            border: none;
-            background: rgba(255, 255, 255, 0.9);
-            font-size: 1.1rem;
-            color: #333;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-        }
-        
-        .career-input::placeholder {
-            color: #888;
-        }
-        
-        .api-key-section {
-            margin-bottom: 25px;
-        }
-        
-        .api-key-input {
-            width: 100%;
-            padding: 15px 20px;
-            border-radius: 12px;
-            border: none;
-            background: rgba(255, 255, 255, 0.9);
+            margin-bottom: 6px;
             font-size: 1rem;
-            color: #333;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
         }
-        
-        .api-key-input::placeholder {
-            color: #888;
-        }
-        
-        .generate-btn {
+        .input-group input {
             width: 100%;
-            padding: 18px;
-            border: none;
-            border-radius: 12px;
-            background: linear-gradient(to right, #FF512F, #F09819);
-            color: white;
-            font-size: 1.3rem;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+            padding: 12px 16px;
+            border-radius: 48px;
+            border: 2px solid #cfe3d4;
+            font-size: 1rem;
+            background: white;
+            transition: 0.2s;
+        }
+        .input-group input:focus {
+            border-color: #ffb347;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(255,180,71,0.2);
+        }
+
+        /* 每个题目卡片 */
+        .question-item {
+            background: #fefef7;
+            border-radius: 28px;
+            padding: 1rem 1.2rem;
+            margin-bottom: 1rem;
+            border: 1px solid #e2f0e2;
+            transition: 0.1s;
+        }
+        .question-text {
+            font-weight: 700;
+            font-size: 1.05rem;
+            color: #1b4d2e;
+            margin-bottom: 12px;
             display: flex;
             align-items: center;
-            justify-content: center;
-            gap: 10px;
+            gap: 12px;
+            flex-wrap: wrap;
         }
-        
-        .generate-btn:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4);
+        .question-text i {
+            font-size: 1.4rem;
+            width: 32px;
+            color: #ffa559;
         }
-        
-        .generate-btn:active {
-            transform: translateY(0);
+        .options {
+            display: flex;
+            gap: 24px;
+            flex-wrap: wrap;
+            align-items: center;
         }
-        
-        .generate-btn:disabled {
-            background: #cccccc;
-            cursor: not-allowed;
-            transform: none;
-            box-shadow: none;
+        .option-label {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: #f2f9f0;
+            padding: 8px 18px;
+            border-radius: 60px;
+            cursor: pointer;
+            transition: 0.2s;
+            font-weight: 500;
+            border: 1px solid #cfe0cf;
         }
-        
-        .result-section {
-            margin-top: 30px;
-            text-align: center;
+        .option-label.selected {
+            background: #e0f0dc;
+            border-color: #ffb347;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.05);
         }
-        
-        .result-title {
-            font-size: 1.6rem;
-            margin-bottom: 20px;
-        }
-        
-        .result-image {
-            width: 100%;
-            max-width: 450px;
-            border-radius: 18px;
-            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4);
-            transition: transform 0.5s ease;
-        }
-        
-        .result-image:hover {
-            transform: scale(1.02);
-        }
-        
-        .loading {
+        .option-label input {
             display: none;
-            text-align: center;
-            margin: 30px 0;
-            padding: 20px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 15px;
         }
-        
-        .spinner {
-            border: 5px solid rgba(255, 255, 255, 0.3);
-            border-radius: 50%;
-            border-top: 5px solid white;
-            width: 60px;
-            height: 60px;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 20px;
+        .option-label span {
+            font-size: 1.1rem;
         }
-        
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        
-        .loading-text {
+        .option-emoji {
             font-size: 1.2rem;
         }
-        
-        .download-btn {
-            display: inline-block;
-            margin-top: 25px;
-            padding: 15px 30px;
-            background: linear-gradient(to right, #4CAF50, #2E8B57);
-            color: white;
-            text-decoration: none;
-            border-radius: 12px;
+
+        .btn {
+            border: none;
+            padding: 12px 28px;
+            border-radius: 48px;
             font-weight: bold;
             font-size: 1.1rem;
-            transition: all 0.3s ease;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            cursor: pointer;
+            transition: 0.2s;
+            background: #2e7d5e;
+            color: white;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
         }
-        
-        .download-btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+        .btn-primary {
+            background: #ffa34d;
+            color: #2d4a2c;
         }
-        
-        .error-message {
+        .btn-primary:hover {
+            background: #ff8c2a;
+            transform: scale(0.97);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        .btn-outline {
+            background: white;
+            color: #2c7840;
+            border: 2px solid #9dc8a5;
+        }
+        .btn-outline:hover {
+            background: #eaffea;
+        }
+        .btn-danger {
+            background: #e67e22;
+        }
+        .btn-group {
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+            margin-top: 20px;
+        }
+
+        /* 个人结果区 */
+        .result-area {
+            background: #e7f3e9;
+            border-radius: 28px;
+            padding: 1rem 1.5rem;
+            margin-top: 20px;
             display: none;
-            background: rgba(255, 0, 0, 0.2);
-            border-left: 5px solid #ff4d4d;
-            padding: 15px;
-            border-radius: 8px;
+        }
+        .result-area.show {
+            display: block;
+        }
+
+        /* 老师专用面板 */
+        .teacher-panel {
+            display: none;
+        }
+        .teacher-panel.show {
+            display: block;
+        }
+
+        .stats-charts {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 28px;
+            margin-bottom: 2rem;
+        }
+        .chart-box {
+            flex: 1;
+            min-width: 260px;
+            background: #ffffffd9;
+            border-radius: 28px;
+            padding: 1rem;
+        }
+        canvas {
+            max-height: 280px;
+            width: 100%;
+        }
+        .insight {
+            background: #fff2e0;
+            padding: 14px 20px;
+            border-radius: 40px;
             margin: 20px 0;
+            font-weight: 500;
+            border-left: 8px solid #ffb347;
         }
-        
-        .examples {
-            margin-top: 15px;
-            font-size: 0.9rem;
-            opacity: 0.8;
+        .record-table {
+            overflow-x: auto;
         }
-        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 24px;
+        }
+        th, td {
+            padding: 10px 8px;
+            border-bottom: 1px solid #d4e2d0;
+            text-align: center;
+        }
+        th {
+            background: #cbe5d1;
+            color: #1b4e2a;
+        }
+        .filter-bar {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+            align-items: flex-end;
+        }
+        .filter-bar input {
+            padding: 8px 14px;
+            border-radius: 60px;
+            border: 1px solid #bdd8be;
+        }
         footer {
             text-align: center;
-            margin-top: 40px;
-            opacity: 0.7;
-            font-size: 0.95rem;
-            padding: 20px;
-            background: rgba(0, 0, 0, 0.2);
-            border-radius: 15px;
+            margin-top: 30px;
+            font-size: 0.85rem;
+            color: #4f7a5a;
         }
-        
-        @media (max-width: 768px) {
-            .app-container {
-                flex-direction: column;
-            }
-            
-            h1 {
-                font-size: 2.2rem;
-            }
+        @media (max-width: 780px) {
+            body { padding: 1rem; }
+            .hero-title h1 { font-size: 1.4rem; }
+            .option-label { padding: 5px 12px; }
         }
-        
-        @media (max-width: 480px) {
-            h1 {
-                font-size: 1.8rem;
-            }
+        .error-msg {
+            color: #e67e22;
+            font-weight: 500;
+            margin-top: 10px;
+        }
+        i.fa, i.far, i.fas {
+            pointer-events: none;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <header>
-            <h1>职业换脸图片生成器</h1>
-            <p class="subtitle">上传您的照片，输入梦想职业，通过AI技术生成您的专属职业形象！实现"我长大了想成为______"的梦想</p>
-        </header>
-        
-        <div class="app-container">
-            <div class="upload-section">
-                <h2 class="section-title">
-                    <i>📤</i> 上传照片
-                </h2>
-                
-                <div class="upload-area" id="upload-area">
-                    <div class="upload-icon">📷</div>
-                    <p class="upload-text">点击上传照片或拖拽到此处</p>
-                    <p class="upload-hint">支持 JPG、PNG 格式，文件小于5MB</p>
-                </div>
-                <input type="file" id="file-input" accept="image/*">
-                
-                <div class="image-preview">
-                    <p id="preview-text">照片预览区域</p>
-                    <img id="preview-image" style="display: none;">
-                </div>
-                
-                <div class="career-input-section">
-                    <label for="career-input" class="career-label">我长大了想成为：</label>
-                    <input type="text" id="career-input" class="career-input" placeholder="例如：消防员、医生、宇航员、教师...">
-                    <p class="examples">提示：可以输入任何职业，如消防员、医生、宇航员、教师、警察、科学家、艺术家、工程师等</p>
-                </div>
-                
-                <div class="api-key-section">
-                    <input type="text" id="api-key-input" class="api-key-input" placeholder="请输入您的DeepSeek API密钥 (可选)">
-                </div>
-                
-                <button class="generate-btn" id="generate-btn">
-                    <i>✨</i> 生成职业形象
-                </button>
-                
-                <div class="loading" id="loading">
-                    <div class="spinner"></div>
-                    <p class="loading-text">正在通过AI处理您的图片...</p>
-                </div>
-                
-                <div class="error-message" id="error-message">
-                    <strong>错误：</strong> <span id="error-text"></span>
-                </div>
-            </div>
-            
-            <div class="preview-section">
-                <h2 class="section-title">
-                    <i>🖼️</i> 生成结果
-                </h2>
-                
-                <div class="result-section">
-                    <p class="result-title">您的职业形象：</p>
-                    <div id="result-container">
-                        <p>生成结果将显示在这里</p>
-                        <img id="result-image" class="result-image" style="display: none;">
-                    </div>
-                    
-                    <a href="#" id="download-btn" class="download-btn" style="display: none;">
-                        <i>📥</i> 下载图片
-                    </a>
-                </div>
-            </div>
-        </div>
-        
-        <footer>
-            <p>© 2023 职业换脸图片生成器 | 使用AI技术生成职业形象 | 仅供娱乐使用</p>
-        </footer>
+<div class="container">
+    <!-- 标题区 -->
+    <div class="hero-title">
+        <h1><i class="fas fa-tint"></i> 《物联网浇花器的实现》学生自评问卷 <i class="fas fa-microchip"></i></h1>
+        <div class="sub">🌿 评价自己的物联网浇花器的实现技能 🌿</div>
     </div>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const fileInput = document.getElementById('file-input');
-            const uploadArea = document.getElementById('upload-area');
-            const previewImage = document.getElementById('preview-image');
-            const previewText = document.getElementById('preview-text');
-            const generateBtn = document.getElementById('generate-btn');
-            const loading = document.getElementById('loading');
-            const resultImage = document.getElementById('result-image');
-            const downloadBtn = document.getElementById('download-btn');
-            const careerInput = document.getElementById('career-input');
-            const apiKeyInput = document.getElementById('api-key-input');
-            const errorMessage = document.getElementById('error-message');
-            const errorText = document.getElementById('error-text');
-            
-            // 上传区域点击事件
-            uploadArea.addEventListener('click', function() {
-                fileInput.click();
+    <!-- 学生问卷填写区 -->
+    <div class="card" id="studentCard">
+        <h2><i class="fas fa-edit"></i> 📝 我的自评</h2>
+        <!-- 5个题目动态渲染 -->
+        <div id="questionsContainer"></div>
+        <div class="btn-group">
+            <button class="btn btn-primary" id="submitBtn"><i class="fas fa-check-circle"></i> 提交自评</button>
+        </div>
+        <div id="studentResult" class="result-area"></div>
+        <div id="formError" class="error-msg"></div>
+    </div>
+
+    <!-- 老师入口按钮 + 老师面板(统计+管理) -->
+    <div style="text-align: center; margin: 0.5rem 0 1rem;">
+        <button id="teacherEntranceBtn" class="btn btn-outline"><i class="fas fa-chalkboard-teacher"></i> 👩‍🏫 老师入口 (查看统计/数据)</button>
+        <button id="closeTeacherPanelBtn" class="btn btn-outline" style="display:none;">🔒 关闭老师面板</button>
+    </div>
+
+    <div id="teacherPanel" class="teacher-panel">
+        <div class="card">
+            <h2><i class="fas fa-chart-line"></i> 📊 班级学情统计</h2>
+            <div class="stats-charts">
+                <div class="chart-box">
+                    <p><strong>🌱 各指标掌握程度占比</strong> (完全/部分/未掌握)</p>
+                    <canvas id="indicatorsChart" width="400" height="250" style="max-height:250px"></canvas>
+                </div>
+                <div class="chart-box">
+                    <p><strong>🥧 总分分布区间</strong> (人数占比)</p>
+                    <canvas id="scorePieChart" width="400" height="250" style="max-height:250px"></canvas>
+                </div>
+            </div>
+            <div id="autoInsight" class="insight">✨ 学情分析: 等待数据...</div>
+        </div>
+
+        <div class="card">
+            <h2><i class="fas fa-database"></i> 📋 所有学生提交记录</h2>
+            <div class="filter-bar">
+                <input type="text" id="filterClass" placeholder="按班级筛选">
+                <input type="text" id="filterName" placeholder="按姓名筛选">
+                <button id="applyFilterBtn" class="btn btn-outline" style="padding: 6px 20px;">🔍 筛选</button>
+                <button id="clearDataBtn" class="btn btn-danger" style="background:#c0392b;">🗑️ 一键清空所有数据</button>
+                <button id="exportCSVBtn" class="btn btn-primary" style="background:#3a7b4e;">📎 导出CSV</button>
+            </div>
+            <div class="record-table">
+                <table id="recordsTable">
+                    <thead>
+                        <tr><th>班级</th><th>姓名</th><th>指标1得分</th><th>指标2得分</th><th>指标3得分</th><th>指标4得分</th><th>指标5得分</th><th>总分</th></tr>
+                    </thead>
+                    <tbody id="recordsTbody"><tr><td colspan="8">暂无提交记录</td></tr></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <footer>🌐 数据保存在浏览器中，可重复使用 | 物联网小创客，智慧浇花 🌸</footer>
+</div>
+
+<script>
+    // ---------- 题库 (满分2分每题) ----------
+    const QUESTIONS = [
+        { text: "我能搞懂物联网远程浇花的两条核心数据流。（2 分）", icon: "fas fa-project-diagram" },
+        { text: "我会按要求完成活动一：硬件连接。（2 分）", icon: "fas fa-plug" },
+        { text: "我能完成活动二：连接物联网平台。（2 分）", icon: "fas fa-cloud-upload-alt" },
+        { text: "我会根据流程图完成活动三，将采集端数据上传到物联网平台。（2 分）", icon: "fas fa-chart-line" },
+        { text: "我能完成活动四，实现远程控制水泵开关。（2 分）", icon: "fas fa-water" }
+    ];
+    const OPTIONS = [
+        { value: 2, label: "完全掌握", emoji: "✅", score: 2 },
+        { value: 1, label: "部分掌握", emoji: "⚠️", score: 1 },
+        { value: 0, label: "未掌握", emoji: "❌", score: 0 }
+    ];
+
+    // ---------- 全局存储 ----------
+    let studentsData = [];     // 存储 { class, name, scores, totalScore, timestamp }
+    let currentCharts = { barChart: null, pieChart: null };
+
+    // 初始化localStorage
+    function loadFromStorage() {
+        const stored = localStorage.getItem("iot_watering_self_eval");
+        if(stored) {
+            studentsData = JSON.parse(stored);
+        } else {
+            studentsData = [];
+        }
+    }
+    function saveToStorage() {
+        localStorage.setItem("iot_watering_self_eval", JSON.stringify(studentsData));
+    }
+
+    // 渲染问卷题目 (动态绑定选中样式)
+    function renderQuestions() {
+        const container = document.getElementById("questionsContainer");
+        container.innerHTML = "";
+        QUESTIONS.forEach((q, idx) => {
+            const qDiv = document.createElement("div");
+            qDiv.className = "question-item";
+            qDiv.dataset.qidx = idx;
+            const textSpan = `<div class="question-text"><i class="${q.icon}"></i> ${q.text}</div>`;
+            qDiv.innerHTML = textSpan + `<div class="options" id="options-${idx}"></div>`;
+            const optionsDiv = qDiv.querySelector(".options");
+            OPTIONS.forEach(opt => {
+                const label = document.createElement("label");
+                label.className = "option-label";
+                label.innerHTML = `<input type="radio" name="q${idx}" value="${opt.value}"> <span class="option-emoji">${opt.emoji}</span> <span>${opt.label}</span>`;
+                label.querySelector("input").addEventListener("change", function(e) {
+                    // 样式切换
+                    document.querySelectorAll(`#options-${idx} .option-label`).forEach(l => l.classList.remove("selected"));
+                    if(this.checked) label.classList.add("selected");
+                });
+                optionsDiv.appendChild(label);
             });
-            
-            // 拖放功能
-            uploadArea.addEventListener('dragover', function(e) {
-                e.preventDefault();
-                uploadArea.style.background = 'rgba(255, 255, 255, 0.2)';
-            });
-            
-            uploadArea.addEventListener('dragleave', function() {
-                uploadArea.style.background = '';
-            });
-            
-            uploadArea.addEventListener('drop', function(e) {
-                e.preventDefault();
-                uploadArea.style.background = '';
-                
-                if (e.dataTransfer.files.length) {
-                    fileInput.files = e.dataTransfer.files;
-                    handleFileSelect(e.dataTransfer.files[0]);
-                }
-            });
-            
-            // 文件选择处理
-            fileInput.addEventListener('change', function() {
-                if (fileInput.files.length) {
-                    handleFileSelect(fileInput.files[0]);
-                }
-            });
-            
-            function handleFileSelect(file) {
-                if (!file.type.match('image.*')) {
-                    showError('请上传图片文件！');
-                    return;
-                }
-                
-                if (file.size > 5 * 1024 * 1024) {
-                    showError('文件大小不能超过5MB！');
-                    return;
-                }
-                
-                const reader = new FileReader();
-                
-                reader.onload = function(e) {
-                    previewImage.src = e.target.result;
-                    previewImage.style.display = 'block';
-                    previewText.style.display = 'none';
-                    hideError();
-                };
-                
-                reader.readAsDataURL(file);
-            }
-            
-            // 生成按钮点击事件
-            generateBtn.addEventListener('click', function() {
-                if (!previewImage.src || previewImage.style.display === 'none') {
-                    showError('请先上传一张照片！');
-                    return;
-                }
-                
-                if (!careerInput.value.trim()) {
-                    showError('请输入您想成为的职业！');
-                    return;
-                }
-                
-                loading.style.display = 'block';
-                hideError();
-                
-                // 模拟处理时间
-                setTimeout(function() {
-                    generateResult();
-                    loading.style.display = 'none';
-                }, 2000);
-            });
-            
-            function generateResult() {
-                const career = careerInput.value.trim();
-                
-                // 创建画布
-                const canvas = document.createElement('canvas');
-                const ctx = canvas.getContext('2d');
-                
-                // 加载用户图片
-                const userImg = new Image();
-                userImg.onload = function() {
-                    // 设置画布尺寸
-                    canvas.width = userImg.width;
-                    canvas.height = userImg.height;
-                    
-                    // 绘制用户图片
-                    ctx.drawImage(userImg, 0, 0, canvas.width, canvas.height);
-                    
-                    // 添加职业文本
-                    ctx.font = 'bold 40px Arial';
-                    ctx.fillStyle = 'white';
-                    ctx.textAlign = 'center';
-                    ctx.textBaseline = 'bottom';
-                    ctx.shadowColor = 'rgba(0, 0, 0, 0.7)';
-                    ctx.shadowBlur = 10;
-                    ctx.shadowOffsetX = 2;
-                    ctx.shadowOffsetY = 2;
-                    
-                    // 在图片底部添加职业文本
-                    ctx.fillText(`我长大了想成为${career}`, canvas.width / 2, canvas.height - 30);
-                    
-                    // 获取结果图片URL
-                    const resultUrl = canvas.toDataURL('image/png');
-                    
-                    // 显示结果
-                    resultImage.src = resultUrl;
-                    resultImage.style.display = 'block';
-                    
-                    // 设置下载链接
-                    downloadBtn.href = resultUrl;
-                    downloadBtn.download = `我的${career}形象.png`;
-                    downloadBtn.style.display = 'inline-block';
-                    
-                    // 更新结果容器文本
-                    document.querySelector('#result-container p').style.display = 'none';
-                };
-                
-                userImg.src = previewImage.src;
-            }
-            
-            function showError(message) {
-                errorText.textContent = message;
-                errorMessage.style.display = 'block';
-            }
-            
-            function hideError() {
-                errorMessage.style.display = 'none';
+            container.appendChild(qDiv);
+        });
+    }
+
+    // 获取当前表单选择的得分数组
+    function getCurrentScores() {
+        let scores = [];
+        for(let i=0; i<QUESTIONS.length; i++) {
+            const selected = document.querySelector(`input[name="q${i}"]:checked`);
+            if(!selected) return null;
+            scores.push(parseInt(selected.value));
+        }
+        return scores;
+    }
+
+    // 展示个人提交结果
+    function showPersonalResult(className, studentName, scores, total) {
+        const resultDiv = document.getElementById("studentResult");
+        let detailHtml = `<div style="background:#fff7e8; border-radius: 28px; padding: 1rem;"><i class="fas fa-star-of-life"></i> <strong>${className} · ${studentName}</strong> 的自评结果<br>`;
+        scores.forEach((score, idx) => {
+            const mastery = score === 2 ? "✅ 完全掌握" : (score === 1 ? "⚠️ 部分掌握" : "❌ 未掌握");
+            detailHtml += `📌 ${QUESTIONS[idx].text.substring(0, 30)}… 得分：${score}分 (${mastery})<br>`;
+        });
+        let feedback = "";
+        if(total === 10) feedback = "🎉 太棒啦！物联网浇花大师就是你！ 🎉";
+        else if(total >= 7) feedback = "👍 还不错！继续加油，巩固一下数据流会更棒！";
+        else feedback = "💪 还有提升空间，加油哦！再试一试硬件连接和平台上传吧～";
+        detailHtml += `<hr><span style="font-size:1.3rem;">⭐ 总分：${total} / 10分 ⭐</span><br>📢 反馈：${feedback}</div>`;
+        resultDiv.innerHTML = detailHtml;
+        resultDiv.classList.add("show");
+    }
+
+    // 刷新老师面板 (图表 + 表格 + 学情分析)
+    function refreshTeacherPanel() {
+        if(studentsData.length === 0) {
+            // 清空图表
+            if(currentCharts.barChart) { currentCharts.barChart.destroy(); currentCharts.barChart=null; }
+            if(currentCharts.pieChart) { currentCharts.pieChart.destroy(); currentCharts.pieChart=null; }
+            document.getElementById("autoInsight").innerHTML = "📭 暂无学生提交数据，请等待学生填写自评问卷～";
+            const tbody = document.getElementById("recordsTbody");
+            tbody.innerHTML = "<tr><td colspan='8'>暂无记录</td></tr>";
+            return;
+        }
+        // 1. 计算每个指标的占比 (完全/部分/未掌握)
+        const total = studentsData.length;
+        // indicatorsData: 每个指标三个比例 [完全占比, 部分占比, 未掌握占比]
+        let indicatorsStats = Array(QUESTIONS.length).fill().map(() => [0,0,0]);
+        studentsData.forEach(record => {
+            const scores = record.scores;
+            for(let i=0; i<QUESTIONS.length; i++) {
+                const s = scores[i];
+                if(s === 2) indicatorsStats[i][0]++;    // 完全
+                else if(s === 1) indicatorsStats[i][1]++; // 部分
+                else indicatorsStats[i][2]++;            // 未掌握
             }
         });
-    </script>
+        // 转成百分比
+        let barLabels = QUESTIONS.map((_,idx)=> `指标${idx+1}`);
+        let completePct = [], partialPct = [], nonePct = [];
+        for(let i=0;i<QUESTIONS.length;i++){
+            completePct.push((indicatorsStats[i][0]/total)*100);
+            partialPct.push((indicatorsStats[i][1]/total)*100);
+            nonePct.push((indicatorsStats[i][2]/total)*100);
+        }
+        // 渲染柱状图 (分组柱)
+        const ctxBar = document.getElementById("indicatorsChart").getContext("2d");
+        if(currentCharts.barChart) currentCharts.barChart.destroy();
+        currentCharts.barChart = new Chart(ctxBar, {
+            type: 'bar',
+            data: {
+                labels: barLabels,
+                datasets: [
+                    { label: '✅ 完全掌握', data: completePct, backgroundColor: '#6fbf4c', borderRadius: 8 },
+                    { label: '⚠️ 部分掌握', data: partialPct, backgroundColor: '#f4b942', borderRadius: 8 },
+                    { label: '❌ 未掌握', data: nonePct, backgroundColor: '#e67e22', borderRadius: 8 }
+                ]
+            },
+            options: {
+                responsive: true, maintainAspectRatio: true,
+                scales: { y: { title: { display: true, text: '学生占比 (%)' }, max: 100, ticks: { callback: (val) => val+'%' } } },
+                plugins: { tooltip: { callbacks: { label: (ctx) => `${ctx.dataset.label}: ${ctx.raw.toFixed(1)}%` } } }
+            }
+        });
+
+        // 2. 总分分布饼图 (0-2分, 3-5分, 6-8分, 9-10分)
+        let ranges = [0,0,0,0]; // 0-2,3-5,6-8,9-10
+        studentsData.forEach(record => {
+            const totalScore = record.totalScore;
+            if(totalScore <= 2) ranges[0]++;
+            else if(totalScore <=5) ranges[1]++;
+            else if(totalScore <=8) ranges[2]++;
+            else ranges[3]++;
+        });
+        const pieLabels = ['0-2分','3-5分','6-8分','9-10分'];
+        const pieData = ranges;
+        const ctxPie = document.getElementById("scorePieChart").getContext("2d");
+        if(currentCharts.pieChart) currentCharts.pieChart.destroy();
+        currentCharts.pieChart = new Chart(ctxPie, {
+            type: 'pie',
+            data: { labels: pieLabels, datasets: [{ data: pieData, backgroundColor: ['#ffb347','#5fa8f3','#6fbf4c','#ffd966'] }] },
+            options: { responsive: true, plugins: { legend: { position: 'bottom' } } }
+        });
+
+        // 3. 学情分析提示 (智能)
+        let insightMsg = "";
+        const firstComplete = completePct[0];
+        const secondComplete = completePct[1];
+        const hardConnComplete = completePct[2];
+        if(firstComplete < 50) insightMsg = "⚠️ 仅 "+firstComplete.toFixed(1)+"% 学生完全理解核心数据流，需要重点讲解数据流向！";
+        else insightMsg = "🌊 "+firstComplete.toFixed(1)+"% 学生已掌握核心数据流，表现良好。";
+        if(secondComplete < 60) insightMsg += " 硬件连接部分掌握率偏低("+secondComplete.toFixed(1)+"%完全掌握)，建议多动手实践。";
+        else insightMsg += " 硬件连接大部分同学已过关。";
+        if(hardConnComplete > 70) insightMsg += " 物联网平台连接及上传数据环节整体较好，继续保持！";
+        else insightMsg += " 注意平台连接及数据上传练习。";
+        document.getElementById("autoInsight").innerHTML = `📊 基于 ${total} 份自评：${insightMsg}`;
+
+        // 刷新表格 (所有记录，未筛选前展示全部)
+        renderRecordsTable(studentsData);
+    }
+
+    // 渲染表格(支持筛选)
+    function renderRecordsTable(dataArray) {
+        const tbody = document.getElementById("recordsTbody");
+        if(!dataArray.length){
+            tbody.innerHTML = "<tr><td colspan='8'>暂无匹配记录</td></tr>";
+            return;
+        }
+        let html = "";
+        dataArray.forEach(rec => {
+            html += `<tr>
+                        <td>${escapeHtml(rec.class)}</td>
+                        <td>${escapeHtml(rec.name)}</td>
+                        ${rec.scores.map(s => `<td>${s}分</td>`).join('')}
+                        <td><strong>${rec.totalScore}</strong></td>
+                     </tr>`;
+        });
+        tbody.innerHTML = html;
+    }
+
+    function escapeHtml(str) { return str.replace(/[&<>]/g, function(m){if(m==='&') return '&amp;'; if(m==='<') return '&lt;'; if(m==='>') return '&gt;'; return m;}); }
+
+    // 筛选逻辑
+    function filterRecords() {
+        let classFilter = document.getElementById("filterClass").value.trim().toLowerCase();
+        let nameFilter = document.getElementById("filterName").value.trim().toLowerCase();
+        let filtered = studentsData.filter(rec => {
+            let matchClass = classFilter === "" || rec.class.toLowerCase().includes(classFilter);
+            let matchName = nameFilter === "" || rec.name.toLowerCase().includes(nameFilter);
+            return matchClass && matchName;
+        });
+        renderRecordsTable(filtered);
+    }
+
+    // 提交自评
+    function handleSubmit() {
+        const className = document.getElementById("className").value.trim();
+        const studentName = document.getElementById("studentName").value.trim();
+        if(className === "" || studentName === ""){
+            document.getElementById("formError").innerText = "❌ 请填写班级和姓名后再提交！";
+            return;
+        }
+        const scores = getCurrentScores();
+        if(!scores){
+            document.getElementById("formError").innerText = "❌ 请完成所有5个题目的自评选项！";
+            return;
+        }
+        const totalScore = scores.reduce((a,b)=>a+b,0);
+        const newRecord = {
+            class: className,
+            name: studentName,
+            scores: scores,
+            totalScore: totalScore,
+            timestamp: Date.now()
+        };
+        studentsData.push(newRecord);
+        saveToStorage();
+        // 展示学生结果
+        showPersonalResult(className, studentName, scores, totalScore);
+        document.getElementById("formError").innerText = "✅ 提交成功！已记录你的自评~";
+        // 可选: 重置题目选项 (便于下一位填写但不重置班级姓名，但为了方便再填，不清空班级姓名，但是重置选项)
+        for(let i=0; i<QUESTIONS.length; i++) {
+            const checkedRadio = document.querySelector(`input[name="q${i}"]:checked`);
+            if(checkedRadio) checkedRadio.checked = false;
+            const optionDiv = document.querySelectorAll(`#options-${i} .option-label`);
+            optionDiv.forEach(lbl => lbl.classList.remove("selected"));
+        }
+        // 若老师面板正在显示，刷新统计
+        const teacherPanel = document.getElementById("teacherPanel");
+        if(teacherPanel.classList.contains("show")) {
+            refreshTeacherPanel();
+        }
+        // 让结果滚动可见
+        document.getElementById("studentResult").scrollIntoView({ behavior: "smooth" });
+    }
+
+    // 清空全部历史
+    function clearAllData() {
+        if(confirm("⚠️ 确认清空所有学生的自评数据吗？此操作不可恢复！")){
+            studentsData = [];
+            saveToStorage();
+            // 清理图表区域
+            if(document.getElementById("teacherPanel").classList.contains("show")){
+                refreshTeacherPanel();
+            } else {
+                // 如果老师面板未开，但是清理后，下次打开也需要刷新干净
+            }
+            document.getElementById("studentResult").classList.remove("show");
+            document.getElementById("formError").innerText = "🗑️ 所有历史数据已清空。";
+            // 若图表存在，下次老师面板展示会重建空状态
+            if(currentCharts.barChart) { currentCharts.barChart.destroy(); currentCharts.barChart=null; }
+            if(currentCharts.pieChart) { currentCharts.pieChart.destroy(); currentCharts.pieChart=null; }
+        }
+    }
+
+    // 导出CSV
+    function exportToCSV() {
+        if(studentsData.length === 0){
+            alert("暂无数据可导出");
+            return;
+        }
+        let csvRows = [["班级","姓名","指标1得分","指标2得分","指标3得分","指标4得分","指标5得分","总分"]];
+        studentsData.forEach(rec => {
+            csvRows.push([rec.class, rec.name, rec.scores[0], rec.scores[1], rec.scores[2], rec.scores[3], rec.scores[4], rec.totalScore]);
+        });
+        const csvContent = csvRows.map(row => row.join(",")).join("\n");
+        const blob = new Blob(["\uFEFF" + csvContent], {type: "text/csv;charset=utf-8;"});
+        const link = document.createElement("a");
+        const url = URL.createObjectURL(blob);
+        link.href = url;
+        link.setAttribute("download","物联网浇花器自评数据.csv");
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+    }
+
+    // 老师入口开关
+    let teacherPanelVisible = false;
+    function showTeacherPanel(show){
+        const panel = document.getElementById("teacherPanel");
+        const teacherBtn = document.getElementById("teacherEntranceBtn");
+        const closeBtn = document.getElementById("closeTeacherPanelBtn");
+        if(show){
+            panel.classList.add("show");
+            teacherBtn.style.display = "none";
+            closeBtn.style.display = "inline-block";
+            refreshTeacherPanel();   // 每次显示时重新拉取最新数据
+        } else {
+            panel.classList.remove("show");
+            teacherBtn.style.display = "inline-block";
+            closeBtn.style.display = "none";
+        }
+        teacherPanelVisible = show;
+    }
+
+    // 初始化事件绑定
+    function bindEvents() {
+        document.getElementById("submitBtn").addEventListener("click", handleSubmit);
+        document.getElementById("teacherEntranceBtn").addEventListener("click", () => showTeacherPanel(true));
+        document.getElementById("closeTeacherPanelBtn").addEventListener("click", () => showTeacherPanel(false));
+        document.getElementById("clearDataBtn").addEventListener("click", clearAllData);
+        document.getElementById("exportCSVBtn").addEventListener("click", exportToCSV);
+        document.getElementById("applyFilterBtn").addEventListener("click", filterRecords);
+        // 按班级姓名筛选时重置
+    }
+
+    // 初始化页面
+    function init() {
+        loadFromStorage();
+        renderQuestions();
+        bindEvents();
+        // 如果有历史数据且老师面板没打开，不渲染；但老师面板打开才会渲染，节省资源
+        // 额外：如果老师之前打开过面板? 默认关闭
+        showTeacherPanel(false);
+        // 确保学生结果区域初始隐藏
+        document.getElementById("studentResult").classList.remove("show");
+    }
+    init();
+</script>
 </body>
 </html>
