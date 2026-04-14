@@ -6,7 +6,6 @@
     <title>物联网浇花器 - 学生自评问卷</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         * {
             margin: 0;
@@ -210,9 +209,9 @@
         }
         .btn-group {
             display: flex;
+            gap: 16px;
             flex-wrap: wrap;
             margin-top: 20px;
-            gap: 16px;
         }
         .result-area {
             background: #e7f3e9;
@@ -309,8 +308,8 @@
 <body>
 <div class="container">
     <div class="hero-title">
-        <h1><i class="fas fa-tint"></i> 物联网浇花器自评问卷 <i class="fas fa-microchip"></i></h1>
-        <div class="sub">🌿 评价自己的物联网浇花器实现技能 🌿</div>
+        <h1><i class="fas fa-tint"></i> 《物联网浇花器的实现》学生自评问卷 <i class="fas fa-microchip"></i></h1>
+        <div class="sub">🌿 评价自己的物联网浇花器的实现技能 🌿</div>
     </div>
 
     <div class="card" id="studentCard">
@@ -333,60 +332,57 @@
         <div id="formError" class="error-msg"></div>
     </div>
 
-    <div style="text-align:center; margin:0.5rem 0 1rem;">
-        <button id="teacherEntranceBtn" class="btn btn-outline">👩‍🏫 老师入口（查看云端数据）</button>
+    <div style="text-align: center; margin: 0.5rem 0 1rem;">
+        <button id="teacherEntranceBtn" class="btn btn-outline"><i class="fas fa-chalkboard-teacher"></i> 👩‍🏫 老师入口 (查看统计/数据)</button>
         <button id="closeTeacherPanelBtn" class="btn btn-outline" style="display:none;">🔒 关闭老师面板</button>
     </div>
 
     <div id="teacherPanel" class="teacher-panel">
         <div class="card">
-            <h2><i class="fas fa-chart-line"></i> 📊 班级学情统计（云端实时）</h2>
+            <h2><i class="fas fa-chart-line"></i> 📊 班级学情统计</h2>
             <div class="stats-charts">
                 <div class="chart-box">
-                    <p><strong>各指标掌握程度</strong></p>
+                    <p><strong>🌱 各指标掌握程度占比</strong></p>
                     <canvas id="indicatorsChart"></canvas>
                 </div>
                 <div class="chart-box">
-                    <p><strong>总分分布</strong></p>
+                    <p><strong>🥧 总分分布区间</strong></p>
                     <canvas id="scorePieChart"></canvas>
                 </div>
             </div>
-            <div id="autoInsight" class="insight">加载中...</div>
+            <div id="autoInsight" class="insight">✨ 学情分析: 加载中...</div>
         </div>
+
         <div class="card">
-            <h2><i class="fas fa-database"></i> 📋 所有提交记录（云端）</h2>
+            <h2><i class="fas fa-database"></i> 📋 所有学生提交记录</h2>
             <div class="filter-bar">
                 <input type="text" id="filterClass" placeholder="按班级筛选">
                 <input type="text" id="filterName" placeholder="按姓名筛选">
                 <button id="applyFilterBtn" class="btn btn-outline">🔍 筛选</button>
+                <button id="clearDataBtn" class="btn btn-danger" style="background:#c0392b;">🗑️ 清空云端数据</button>
                 <button id="exportCSVBtn" class="btn btn-primary" style="background:#3a7b4e;">📎 导出CSV</button>
             </div>
             <div class="record-table">
                 <table>
                     <thead>
-                        <tr>
-                            <th>班级</th><th>姓名</th><th>指标1</th><th>指标2</th><th>指标3</th><th>指标4</th><th>指标5</th><th>总分</th>
-                        </tr>
+                        <tr><th>班级</th><th>姓名</th><th>指标1</th><th>指标2</th><th>指标3</th><th>指标4</th><th>指标5</th><th>总分</th></tr>
                     </thead>
-                    <tbody id="recordsTbody">
-                        <tr><td colspan="8">加载云端数据...</td></tr>
-                    </tbody>
+                    <tbody id="recordsTbody"><tr><td colspan="8">加载中...</td></tr></tbody>
                 </table>
             </div>
         </div>
     </div>
 
-    <footer>☁️ 数据已保存到云端 | 物联网浇花器自评系统</footer>
+    <footer>🌐 数据已云端存储 | 物联网小创客，智慧浇花 🌸</footer>
 </div>
 
 <script>
-// ===================== 你的数据库已填好 =====================
-const SUPABASE_URL = "https://ggymfpcgdxenwxswafsh.supabase.co";
-const SUPABASE_KEY = "sb_publishable_Qz3YgfuEoc6d0wwZDAWDLA_S5H3PjZU";
+// ========== 云数据库配置（你的Upstash已填好） ==========
+const REDIS_URL = "https://evident-buffalo-98582.upstash.io";
+const REDIS_TOKEN = "gQAAAAAAAYEWAAIncDI3NWUzOTJlZWU3MjQ0NTBkYjNlZGU5YjJhZDdjMTVjMXAyOTg1ODI";
+const KEY = "iot_eval_data";
 
-const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-
-// 问卷题目
+// ========== 题目配置 ==========
 const QUESTIONS = [
     { text: "我能搞懂物联网远程浇花的两条核心数据流。（2 分）", icon: "fas fa-project-diagram" },
     { text: "我会按要求完成活动一：硬件连接。（2 分）", icon: "fas fa-plug" },
@@ -396,261 +392,216 @@ const QUESTIONS = [
 ];
 
 const OPTIONS = [
-    { value: 2, label: "完全掌握", emoji: "✅", score: 2 },
-    { value: 1, label: "部分掌握", emoji: "⚠️", score: 1 },
-    { value: 0, label: "未掌握", emoji: "❌", score: 0 }
+    { value: 2, label: "完全掌握", emoji: "✅" },
+    { value: 1, label: "部分掌握", emoji: "⚠️" },
+    { value: 0, label: "未掌握", emoji: "❌" }
 ];
 
+let studentsData = [];
 let currentCharts = { barChart: null, pieChart: null };
-let allRecords = [];
 
-// 渲染题目
-function renderQuestions() {
-    const container = document.getElementById("questionsContainer");
-    container.innerHTML = "";
-    QUESTIONS.forEach((q, idx) => {
-        const qDiv = document.createElement("div");
-        qDiv.className = "question-item";
-        qDiv.innerHTML = `
-            <div class="question-text">
-                <i class="${q.icon}"></i> ${q.text}
-            </div>
-            <div class="options" id="options-${idx}"></div>
-        `;
-        const optionsDiv = qDiv.querySelector(".options");
-        OPTIONS.forEach(opt => {
-            const label = document.createElement("label");
-            label.className = "option-label";
-            label.innerHTML = `
-                <input type="radio" name="q${idx}" value="${opt.value}">
-                <span class="option-emoji">${opt.emoji}</span>
-                <span>${opt.label}</span>
-            `;
-            label.querySelector("input").addEventListener("change", () => {
-                document.querySelectorAll(`#options-${idx} .option-label`).forEach(l => l.classList.remove("selected"));
-                label.classList.add("selected");
-            });
-            optionsDiv.appendChild(label);
-        });
-        container.appendChild(qDiv);
+// ========== 云端读写核心函数 ==========
+async function redisPush(data) {
+    const res = await fetch(`${REDIS_URL}/lpush/${KEY}/${encodeURIComponent(JSON.stringify(data))}`, {
+        headers: { Authorization: "Bearer " + REDIS_TOKEN }
+    });
+    return await res.json();
+}
+
+async function redisList() {
+    const res = await fetch(`${REDIS_URL}/lrange/${KEY}/0/1000`, {
+        headers: { Authorization: "Bearer " + REDIS_TOKEN }
+    });
+    const j = await res.json();
+    return j.result || [];
+}
+
+async function redisFlush() {
+    await fetch(`${REDIS_URL}/del/${KEY}`, {
+        headers: { Authorization: "Bearer " + REDIS_TOKEN }
     });
 }
 
-// 获取分数
-function getCurrentScores() {
-    let scores = [];
-    for (let i = 0; i < QUESTIONS.length; i++) {
-        const sel = document.querySelector(`input[name="q${i}"]:checked`);
-        if (!sel) return null;
-        scores.push(parseInt(sel.value));
+// ========== 页面逻辑 ==========
+function renderQuestions() {
+    const c = document.getElementById("questionsContainer");
+    c.innerHTML = "";
+    QUESTIONS.forEach((q, idx) => {
+        const div = document.createElement("div");
+        div.className = "question-item";
+        div.innerHTML = `
+            <div class="question-text"><i class="${q.icon}"></i> ${q.text}</div>
+            <div class="options" id="opt-${idx}"></div>
+        `;
+        const opt = div.querySelector(".options");
+        OPTIONS.forEach(o => {
+            const l = document.createElement("label");
+            l.className = "option-label";
+            l.innerHTML = `<input type="radio" name="q${idx}" value="${o.value}">
+                <span class="option-emoji">${o.emoji}</span> <span>${o.label}</span>`;
+            l.querySelector("input").addEventListener("change", () => {
+                document.querySelectorAll(`#opt-${idx} .option-label`).forEach(x => x.classList.remove("selected"));
+                l.classList.add("selected");
+            });
+            opt.appendChild(l);
+        });
+        c.appendChild(div);
+    });
+}
+
+function getScores() {
+    const s = [];
+    for (let i = 0; i < 5; i++) {
+        const v = document.querySelector(`input[name="q${i}"]:checked`)?.value;
+        if (v === undefined) return null;
+        s.push(Number(v));
     }
-    return scores;
+    return s;
+}
+
+function showResult(cls, name, scores, total) {
+    const r = document.getElementById("studentResult");
+    let html = `<div style="padding:1rem;border-radius:20px;background:#fff9ea;">`;
+    html += `<h3>✅ ${cls} · ${name} 自评完成</h3>`;
+    scores.forEach((sc, i) => {
+        const t = sc === 2 ? "完全掌握" : sc === 1 ? "部分掌握" : "未掌握";
+        html += `<p>指标${i+1}：${sc}分 (${t})</p>`;
+    });
+    const tip = total === 10 ? "🎉 满分！你是物联网小高手！" :
+               total >= 7 ? "👍 掌握得很好！" : "💪 多练习就更棒啦！";
+    html += `<h3>总分：${total}/10分</h3><p>${tip}</p></div>`;
+    r.innerHTML = html;
+    r.classList.add("show");
 }
 
 // 提交到云端
-async function handleSubmit() {
-    const className = document.getElementById("className").value.trim();
-    const studentName = document.getElementById("studentName").value.trim();
-    const scores = getCurrentScores();
+document.getElementById("submitBtn").addEventListener("click", async () => {
+    const cls = document.getElementById("className").value.trim();
+    const name = document.getElementById("studentName").value.trim();
+    const err = document.getElementById("formError");
+    const scores = getScores();
 
-    if (!className || !studentName) {
-        document.getElementById("formError").innerText = "请填写班级和姓名！";
-        return;
-    }
-    if (!scores) {
-        document.getElementById("formError").innerText = "请完成所有题目！";
-        return;
-    }
+    if (!cls || !name) { err.innerText = "❌ 请填写班级和姓名"; return; }
+    if (!scores) { err.innerText = "❌ 请完成所有题目"; return; }
 
-    const totalScore = scores.reduce((a, b) => a + b, 0);
+    const total = scores.reduce((a, b) => a + b, 0);
+    const data = { cls, name, scores, total, time: new Date().toLocaleString() };
 
-    // 提交到云端数据库
-    const { error } = await supabase.from("eval_data").insert([
-        {
-            class: className,
-            name: studentName,
-            score1: scores[0],
-            score2: scores[1],
-            score3: scores[2],
-            score4: scores[3],
-            score5: scores[4],
-            total: totalScore
-        }
-    ]);
+    await redisPush(data);
+    err.innerText = "✅ 提交成功！数据已保存到云端";
+    showResult(cls, name, scores, total);
 
-    if (error) {
-        document.getElementById("formError").innerText = "提交失败：" + error.message;
-        return;
-    }
-
-    // 提交成功
-    showPersonalResult(className, studentName, scores, totalScore);
-    document.getElementById("formError").innerText = "✅ 提交成功！数据已保存到云端";
-
-    // 重置选项
+    document.querySelectorAll('input[type="radio"]').forEach(i => i.checked = false);
     document.querySelectorAll(".option-label").forEach(l => l.classList.remove("selected"));
-    document.querySelectorAll('input[type="radio"]').forEach(r => r.checked = false);
+});
+
+// 加载云端数据
+async function loadCloudData() {
+    const raw = await redisList();
+    studentsData = raw.map(x => JSON.parse(x));
+    refreshTeacherPanel();
 }
 
-// 显示个人结果
-function showPersonalResult(className, name, scores, total) {
-    const div = document.getElementById("studentResult");
-    let html = `<strong>${className} · ${name}</strong> 自评结果<br>`;
-    scores.forEach((s, i) => {
-        let level = s === 2 ? "完全掌握" : s === 1 ? "部分掌握" : "未掌握";
-        html += `指标${i+1}：${s}分（${level}）<br>`;
-    });
-    let text = total === 10 ? "🎉 满分！你是浇花大师！" :
-               total >= 7 ? "👍 很棒，继续巩固！" :
-               "💪 多练习，你会更强！";
-    html += `<br><strong>总分：${total}/10分</strong><br>${text}`;
-    div.innerHTML = html;
-    div.classList.add("show");
-}
-
-// 从云端加载所有数据
-async function loadAllData() {
-    const { data, error } = await supabase.from("eval_data").select("*").order("id", { ascending: false });
-    if (error) {
-        document.getElementById("recordsTbody").innerHTML = `<tr><td colspan="8">加载失败：${error.message}</td></tr>`;
-        return [];
-    }
-    allRecords = data;
-    renderTable(data);
-    refreshCharts(data);
-    return data;
-}
-
-// 渲染表格
-function renderTable(data) {
+function refreshTeacherPanel() {
     const tbody = document.getElementById("recordsTbody");
-    if (!data.length) {
+    if (studentsData.length === 0) {
         tbody.innerHTML = "<tr><td colspan='8'>暂无提交</td></tr>";
+        document.getElementById("autoInsight").innerText = "暂无数据";
         return;
     }
-    tbody.innerHTML = data.map(r => `
+
+    tbody.innerHTML = studentsData.map(d => `
         <tr>
-            <td>${r.class}</td>
-            <td>${r.name}</td>
-            <td>${r.score1}</td>
-            <td>${r.score2}</td>
-            <td>${r.score3}</td>
-            <td>${r.score4}</td>
-            <td>${r.score5}</td>
-            <td><strong>${r.total}</strong></td>
+            <td>${d.cls}</td>
+            <td>${d.name}</td>
+            ${d.scores.map(s => `<td>${s}</td>`).join('')}
+            <td><strong>${d.total}</strong></td>
         </tr>
-    `).join("");
+    `).join('');
+
+    drawCharts();
 }
 
-// 刷新图表
-function refreshCharts(data) {
-    if (!data.length) return;
-    const total = data.length;
-
-    let indicators = [[0,0,0],[0,0,0],[0,0,0],[0,0,0],[0,0,0]];
-    data.forEach(r => {
-        [r.score1, r.score2, r.score3, r.score4, r.score5].forEach((s, i) => {
-            if (s === 2) indicators[i][0]++;
-            else if (s === 1) indicators[i][1]++;
-            else indicators[i][2]++;
+function drawCharts() {
+    const total = studentsData.length;
+    const s = [[0,0,0],[0,0,0],[0,0,0],[0,0,0],[0,0,0]];
+    studentsData.forEach(d => {
+        d.scores.forEach((sc, i) => {
+            if (sc === 2) s[i][0]++;
+            else if (sc === 1) s[i][1]++;
+            else s[i][2]++;
         });
     });
 
-    const barLabels = ["指标1","指标2","指标3","指标4","指标5"];
-    const complete = indicators.map(i => (i[0]/total)*100);
-    const partial = indicators.map(i => (i[1]/total)*100);
-    const none = indicators.map(i => (i[2]/total)*100);
-
+    const ctx1 = document.getElementById("indicatorsChart").getContext("2d");
     if (currentCharts.barChart) currentCharts.barChart.destroy();
-    const ctxBar = document.getElementById("indicatorsChart").getContext("2d");
-    currentCharts.barChart = new Chart(ctxBar, {
+    currentCharts.barChart = new Chart(ctx1, {
         type: "bar",
         data: {
-            labels: barLabels,
+            labels: ["指标1","指标2","指标3","指标4","指标5"],
             datasets: [
-                { label: "完全掌握", data: complete, backgroundColor: "#6fbf4c" },
-                { label: "部分掌握", data: partial, backgroundColor: "#f4b942" },
-                { label: "未掌握", data: none, backgroundColor: "#e67e22" }
+                { label: "完全掌握", data: s.map(x => (x[0]/total)*100), backgroundColor: "#6fbf4c" },
+                { label: "部分掌握", data: s.map(x => (x[1]/total)*100), backgroundColor: "#f4b942" },
+                { label: "未掌握", data: s.map(x => (x[2]/total)*100), backgroundColor: "#e67e22" }
             ]
         },
-        options: { responsive: true, scales: { y: { beginAtZero: true, max: 100 } } }
+        options: { responsive: true, maintainAspectRatio: false }
     });
-
-    let ranges = [0,0,0,0];
-    data.forEach(r => {
-        if (r.total <= 2) ranges[0]++;
-        else if (r.total <=5) ranges[1]++;
-        else if (r.total <=8) ranges[2]++;
-        else ranges[3]++;
-    });
-
-    if (currentCharts.pieChart) currentCharts.pieChart.destroy();
-    const ctxPie = document.getElementById("scorePieChart").getContext("2d");
-    currentCharts.pieChart = new Chart(ctxPie, {
-        type: "pie",
-        data: {
-            labels: ["0-2分","3-5分","6-8分","9-10分"],
-            datasets: [{ data: ranges, backgroundColor: ["#ffb347","#5fa8f3","#6fbf4c","#ffd966"] }]
-        }
-    });
-
-    document.getElementById("autoInsight").innerHTML = `📊 共${total}条云端数据，实时更新`;
-}
-
-// 筛选
-function filterRecords() {
-    const c = document.getElementById("filterClass").value.toLowerCase();
-    const n = document.getElementById("filterName").value.toLowerCase();
-    const filtered = allRecords.filter(r => 
-        r.class.toLowerCase().includes(c) && r.name.toLowerCase().includes(n)
-    );
-    renderTable(filtered);
-}
-
-// 导出
-function exportCSV() {
-    if (!allRecords.length) { alert("无数据"); return; }
-    const rows = [["班级","姓名","指标1","指标2","指标3","指标4","指标5","总分"]];
-    allRecords.forEach(r => {
-        rows.push([r.class, r.name, r.score1, r.score2, r.score3, r.score4, r.score5, r.total]);
-    });
-    const csv = "\uFEFF" + rows.map(e => e.join(",")).join("\n");
-    const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
-    const a = document.createElement("a");
-    a.href = URL.createObjectURL(blob);
-    a.download = "浇花器自评_云端数据.csv";
-    a.click();
 }
 
 // 老师面板
-function showTeacherPanel(show) {
-    const panel = document.getElementById("teacherPanel");
-    const openBtn = document.getElementById("teacherEntranceBtn");
-    const closeBtn = document.getElementById("closeTeacherPanelBtn");
-    if (show) {
-        panel.classList.add("show");
-        openBtn.style.display = "none";
-        closeBtn.style.display = "inline-block";
-        loadAllData();
-    } else {
-        panel.classList.remove("show");
-        openBtn.style.display = "inline-block";
-        closeBtn.style.display = "none";
-    }
-}
+document.getElementById("teacherEntranceBtn").addEventListener("click", async () => {
+    document.getElementById("teacherPanel").classList.add("show");
+    document.getElementById("teacherEntranceBtn").style.display = "none";
+    document.getElementById("closeTeacherPanelBtn").style.display = "inline-block";
+    await loadCloudData();
+});
 
-// 绑定事件
-function bindEvents() {
-    document.getElementById("submitBtn").onclick = handleSubmit;
-    document.getElementById("teacherEntranceBtn").onclick = () => showTeacherPanel(true);
-    document.getElementById("closeTeacherPanelBtn").onclick = () => showTeacherPanel(false);
-    document.getElementById("applyFilterBtn").onclick = filterRecords;
-    document.getElementById("exportCSVBtn").onclick = exportCSV;
-}
+document.getElementById("closeTeacherPanelBtn").addEventListener("click", () => {
+    document.getElementById("teacherPanel").classList.remove("show");
+    document.getElementById("teacherEntranceBtn").style.display = "inline-block";
+    document.getElementById("closeTeacherPanelBtn").style.display = "none";
+});
+
+document.getElementById("clearDataBtn").addEventListener("click", async () => {
+    if (confirm("确定清空云端所有数据？不可恢复！")) {
+        await redisFlush();
+        await loadCloudData();
+        alert("已清空");
+    }
+});
+
+document.getElementById("exportCSVBtn").addEventListener("click", () => {
+    if (studentsData.length === 0) { alert("无数据"); return; }
+    const csv = [["班级","姓名","指标1","指标2","指标3","指标4","指标5","总分"]];
+    studentsData.forEach(d => {
+        csv.push([d.cls, d.name, ...d.scores, d.total]);
+    });
+    const blob = new Blob(["\uFEFF" + csv.map(e => e.join(",")).join("\n")], { type: "text/csv" });
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = "自评数据.csv";
+    a.click();
+});
+
+document.getElementById("applyFilterBtn").addEventListener("click", () => {
+    const c = document.getElementById("filterClass").value.toLowerCase();
+    const n = document.getElementById("filterName").value.toLowerCase();
+    const f = studentsData.filter(d =>
+        d.cls.toLowerCase().includes(c) && d.name.toLowerCase().includes(n)
+    );
+    document.getElementById("recordsTbody").innerHTML = f.map(d => `
+        <tr>
+            <td>${d.cls}</td>
+            <td>${d.name}</td>
+            ${d.scores.map(s => `<td>${s}</td>`).join('')}
+            <td><strong>${d.total}</strong></td>
+        </tr>
+    `).join('') || "<tr><td colspan='8'>无匹配</td></tr>";
+});
 
 // 初始化
 renderQuestions();
-bindEvents();
 </script>
 </body>
 </html>
