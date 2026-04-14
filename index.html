@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>职业换脸图片生成器 - 自定义职业版</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
+            color: white;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+        }
+        
+        h1 {
+            font-size: 2.8rem;
+            margin-bottom: 15px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+        
+        .subtitle {
+            font-size: 1.3rem;
+            opacity: 0.9;
+            max-width: 700px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+        
+        .app-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 30px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(15px);
+            border-radius: 25px;
+            padding: 35px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+            margin-bottom: 30px;
+        }
+        
+        .upload-section {
+            flex: 1;
+            min-width: 320px;
+        }
+        
+        .preview-section {
+            flex: 1;
+            min-width: 320px;
+        }
+        
+        .section-title {
+            font-size: 1.6rem;
+            margin-bottom: 25px;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.4);
+            padding-bottom: 12px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .section-title i {
+            margin-right: 10px;
+            font-size: 1.4rem;
+        }
+        
+        .upload-area {
+            border: 3px dashed rgba(255, 255, 255, 0.6);
+            border-radius: 20px;
+            padding: 50px 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 25px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .upload-area:hover {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: rgba(255, 255, 255, 0.9);
+            transform: translateY(-5px);
+        }
+        
+        .upload-icon {
+            font-size: 70px;
+            margin-bottom: 20px;
+            color: rgba(255, 255, 255, 0.8);
+        }
+        
+        .upload-text {
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+        }
+        
+        .upload-hint {
+            font-size: 0.9rem;
+            opacity: 0.7;
+        }
+        
+        #file-input {
+            display: none;
+        }
+        
+        .image-preview {
+            width: 100%;
+            height: 280px;
+            border-radius: 18px;
+            background: rgba(0, 0, 0, 0.25);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            margin-bottom: 25px;
+            position: relative;
+            box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.2);
+        }
+        
+        .image-preview img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+            border-radius: 15px;
+        }
+        
+        .career-input-section {
+            margin-bottom: 25px;
+        }
+        
+        .career-label {
+            display: block;
+            margin-bottom: 15px;
+            font-size: 1.2rem;
+        }
+        
+        .career-input {
+            width: 100%;
+            padding: 15px 20px;
+            border-radius: 12px;
+            border: none;
+            background: rgba(255, 255, 255, 0.9);
+            font-size: 1.1rem;
+            color: #333;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .career-input::placeholder {
+            color: #888;
+        }
+        
+        .api-key-section {
+            margin-bottom: 25px;
+        }
+        
+        .api-key-input {
+            width: 100%;
+            padding: 15px 20px;
+            border-radius: 12px;
+            border: none;
+            background: rgba(255, 255, 255, 0.9);
+            font-size: 1rem;
+            color: #333;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .api-key-input::placeholder {
+            color: #888;
+        }
+        
+        .generate-btn {
+            width: 100%;
+            padding: 18px;
+            border: none;
+            border-radius: 12px;
+            background: linear-gradient(to right, #FF512F, #F09819);
+            color: white;
+            font-size: 1.3rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        .generate-btn:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4);
+        }
+        
+        .generate-btn:active {
+            transform: translateY(0);
+        }
+        
+        .generate-btn:disabled {
+            background: #cccccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        .result-section {
+            margin-top: 30px;
+            text-align: center;
+        }
+        
+        .result-title {
+            font-size: 1.6rem;
+            margin-bottom: 20px;
+        }
+        
+        .result-image {
+            width: 100%;
+            max-width: 450px;
+            border-radius: 18px;
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4);
+            transition: transform 0.5s ease;
+        }
+        
+        .result-image:hover {
+            transform: scale(1.02);
+        }
+        
+        .loading {
+            display: none;
+            text-align: center;
+            margin: 30px 0;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+        }
+        
+        .spinner {
+            border: 5px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top: 5px solid white;
+            width: 60px;
+            height: 60px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .loading-text {
+            font-size: 1.2rem;
+        }
+        
+        .download-btn {
+            display: inline-block;
+            margin-top: 25px;
+            padding: 15px 30px;
+            background: linear-gradient(to right, #4CAF50, #2E8B57);
+            color: white;
+            text-decoration: none;
+            border-radius: 12px;
+            font-weight: bold;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .download-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+        }
+        
+        .error-message {
+            display: none;
+            background: rgba(255, 0, 0, 0.2);
+            border-left: 5px solid #ff4d4d;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        
+        .examples {
+            margin-top: 15px;
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+        
+        footer {
+            text-align: center;
+            margin-top: 40px;
+            opacity: 0.7;
+            font-size: 0.95rem;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 15px;
+        }
+        
+        @media (max-width: 768px) {
+            .app-container {
+                flex-direction: column;
+            }
+            
+            h1 {
+                font-size: 2.2rem;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            h1 {
+                font-size: 1.8rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>职业换脸图片生成器</h1>
+            <p class="subtitle">上传您的照片，输入梦想职业，通过AI技术生成您的专属职业形象！实现"我长大了想成为______"的梦想</p>
+        </header>
+        
+        <div class="app-container">
+            <div class="upload-section">
+                <h2 class="section-title">
+                    <i>📤</i> 上传照片
+                </h2>
+                
+                <div class="upload-area" id="upload-area">
+                    <div class="upload-icon">📷</div>
+                    <p class="upload-text">点击上传照片或拖拽到此处</p>
+                    <p class="upload-hint">支持 JPG、PNG 格式，文件小于5MB</p>
+                </div>
+                <input type="file" id="file-input" accept="image/*">
+                
+                <div class="image-preview">
+                    <p id="preview-text">照片预览区域</p>
+                    <img id="preview-image" style="display: none;">
+                </div>
+                
+                <div class="career-input-section">
+                    <label for="career-input" class="career-label">我长大了想成为：</label>
+                    <input type="text" id="career-input" class="career-input" placeholder="例如：消防员、医生、宇航员、教师...">
+                    <p class="examples">提示：可以输入任何职业，如消防员、医生、宇航员、教师、警察、科学家、艺术家、工程师等</p>
+                </div>
+                
+                <div class="api-key-section">
+                    <input type="text" id="api-key-input" class="api-key-input" placeholder="请输入您的DeepSeek API密钥 (可选)">
+                </div>
+                
+                <button class="generate-btn" id="generate-btn">
+                    <i>✨</i> 生成职业形象
+                </button>
+                
+                <div class="loading" id="loading">
+                    <div class="spinner"></div>
+                    <p class="loading-text">正在通过AI处理您的图片...</p>
+                </div>
+                
+                <div class="error-message" id="error-message">
+                    <strong>错误：</strong> <span id="error-text"></span>
+                </div>
+            </div>
+            
+            <div class="preview-section">
+                <h2 class="section-title">
+                    <i>🖼️</i> 生成结果
+                </h2>
+                
+                <div class="result-section">
+                    <p class="result-title">您的职业形象：</p>
+                    <div id="result-container">
+                        <p>生成结果将显示在这里</p>
+                        <img id="result-image" class="result-image" style="display: none;">
+                    </div>
+                    
+                    <a href="#" id="download-btn" class="download-btn" style="display: none;">
+                        <i>📥</i> 下载图片
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <footer>
+            <p>© 2023 职业换脸图片生成器 | 使用AI技术生成职业形象 | 仅供娱乐使用</p>
+        </footer>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const fileInput = document.getElementById('file-input');
+            const uploadArea = document.getElementById('upload-area');
+            const previewImage = document.getElementById('preview-image');
+            const previewText = document.getElementById('preview-text');
+            const generateBtn = document.getElementById('generate-btn');
+            const loading = document.getElementById('loading');
+            const resultImage = document.getElementById('result-image');
+            const downloadBtn = document.getElementById('download-btn');
+            const careerInput = document.getElementById('career-input');
+            const apiKeyInput = document.getElementById('api-key-input');
+            const errorMessage = document.getElementById('error-message');
+            const errorText = document.getElementById('error-text');
+            
+            // 上传区域点击事件
+            uploadArea.addEventListener('click', function() {
+                fileInput.click();
+            });
+            
+            // 拖放功能
+            uploadArea.addEventListener('dragover', function(e) {
+                e.preventDefault();
+                uploadArea.style.background = 'rgba(255, 255, 255, 0.2)';
+            });
+            
+            uploadArea.addEventListener('dragleave', function() {
+                uploadArea.style.background = '';
+            });
+            
+            uploadArea.addEventListener('drop', function(e) {
+                e.preventDefault();
+                uploadArea.style.background = '';
+                
+                if (e.dataTransfer.files.length) {
+                    fileInput.files = e.dataTransfer.files;
+                    handleFileSelect(e.dataTransfer.files[0]);
+                }
+            });
+            
+            // 文件选择处理
+            fileInput.addEventListener('change', function() {
+                if (fileInput.files.length) {
+                    handleFileSelect(fileInput.files[0]);
+                }
+            });
+            
+            function handleFileSelect(file) {
+                if (!file.type.match('image.*')) {
+                    showError('请上传图片文件！');
+                    return;
+                }
+                
+                if (file.size > 5 * 1024 * 1024) {
+                    showError('文件大小不能超过5MB！');
+                    return;
+                }
+                
+                const reader = new FileReader();
+                
+                reader.onload = function(e) {
+                    previewImage.src = e.target.result;
+                    previewImage.style.display = 'block';
+                    previewText.style.display = 'none';
+                    hideError();
+                };
+                
+                reader.readAsDataURL(file);
+            }
+            
+            // 生成按钮点击事件
+            generateBtn.addEventListener('click', function() {
+                if (!previewImage.src || previewImage.style.display === 'none') {
+                    showError('请先上传一张照片！');
+                    return;
+                }
+                
+                if (!careerInput.value.trim()) {
+                    showError('请输入您想成为的职业！');
+                    return;
+                }
+                
+                loading.style.display = 'block';
+                hideError();
+                
+                // 模拟处理时间
+                setTimeout(function() {
+                    generateResult();
+                    loading.style.display = 'none';
+                }, 2000);
+            });
+            
+            function generateResult() {
+                const career = careerInput.value.trim();
+                
+                // 创建画布
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+                
+                // 加载用户图片
+                const userImg = new Image();
+                userImg.onload = function() {
+                    // 设置画布尺寸
+                    canvas.width = userImg.width;
+                    canvas.height = userImg.height;
+                    
+                    // 绘制用户图片
+                    ctx.drawImage(userImg, 0, 0, canvas.width, canvas.height);
+                    
+                    // 添加职业文本
+                    ctx.font = 'bold 40px Arial';
+                    ctx.fillStyle = 'white';
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'bottom';
+                    ctx.shadowColor = 'rgba(0, 0, 0, 0.7)';
+                    ctx.shadowBlur = 10;
+                    ctx.shadowOffsetX = 2;
+                    ctx.shadowOffsetY = 2;
+                    
+                    // 在图片底部添加职业文本
+                    ctx.fillText(`我长大了想成为${career}`, canvas.width / 2, canvas.height - 30);
+                    
+                    // 获取结果图片URL
+                    const resultUrl = canvas.toDataURL('image/png');
+                    
+                    // 显示结果
+                    resultImage.src = resultUrl;
+                    resultImage.style.display = 'block';
+                    
+                    // 设置下载链接
+                    downloadBtn.href = resultUrl;
+                    downloadBtn.download = `我的${career}形象.png`;
+                    downloadBtn.style.display = 'inline-block';
+                    
+                    // 更新结果容器文本
+                    document.querySelector('#result-container p').style.display = 'none';
+                };
+                
+                userImg.src = previewImage.src;
+            }
+            
+            function showError(message) {
+                errorText.textContent = message;
+                errorMessage.style.display = 'block';
+            }
+            
+            function hideError() {
+                errorMessage.style.display = 'none';
+            }
+        });
+    </script>
+</body>
+</html>
